@@ -105,7 +105,7 @@ jobs:
           images: |
             ${{ vars.DOCKER_REPO }}
           flavor: |
-            latest=false
+            latest=true
           tags: |
             type=sha,prefix=
             type=ref,event=branch
