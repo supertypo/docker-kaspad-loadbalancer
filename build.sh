@@ -1,7 +1,7 @@
 #!/bin/sh
 
 REPO_URL_MAIN="https://github.com/supertypop/docker-kaspad-loadbalancer"
-DOCKER_REPO_PREFIX="supertypo/kaspad-loadbalancer"
+DOCKER_REPO="supertypo/kaspad-loadbalancer"
 ARCHES="linux/amd64 linux/arm64"
 
 BUILD_DIR="$(dirname $0)"
@@ -28,19 +28,18 @@ plain_build() {
   echo "===================================================="
   echo " Running current arch build"
   echo "===================================================="
-  dockerRepo="${DOCKER_REPO_PREFIX}-$1"
 
-  $docker build --pull --tag $dockerRepo:$tag "$BUILD_DIR"
+  $docker build --pull --tag $DOCKER_REPO:$tag "$BUILD_DIR"
 
   for version in $VERSIONS; do
-    $docker tag $dockerRepo:$tag $dockerRepo:$version
-    echo Tagged $dockerRepo:$version
+    $docker tag $DOCKER_REPO:$tag $DOCKER_REPO:$version
+    echo Tagged $DOCKER_REPO:$version
   done
 
   if [ "$PUSH" = "push" ]; then
-    $docker push $dockerRepo:$tag
+    $docker push $DOCKER_REPO:$tag
     for version in $VERSIONS; do
-      $docker push $dockerRepo:$version
+      $docker push $DOCKER_REPO:$version
     done
   fi
   echo "===================================================="
@@ -53,7 +52,6 @@ multi_arch_build() {
   echo "===================================================="
   echo " Running multi arch build"
   echo "===================================================="
-  dockerRepo="${DOCKER_REPO_PREFIX}-$1"
   dockerRepoArgs=
 
   if [ "$PUSH" = "push" ]; then
@@ -61,11 +59,11 @@ multi_arch_build() {
   fi
 
   for version in $VERSIONS; do
-    dockerRepoArgs="$dockerRepoArgs --tag $dockerRepo:$version"
+    dockerRepoArgs="$dockerRepoArgs --tag $DOCKER_REPO:$version"
   done
 
   $docker buildx build --pull --platform=$(echo $ARCHES | sed 's/ /,/g') $dockerRepoArgs \
-    --tag $dockerRepo:$tag "$BUILD_DIR"
+    --tag $DOCKER_REPO:$tag "$BUILD_DIR"
   echo "===================================================="
   echo " Completed multi arch build"
   echo "===================================================="
